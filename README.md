@@ -75,8 +75,5 @@ npm start # Starts React development server
 ## Contributing
 Pull requests welcome! Please open issues for bugs or feature requests.
 
-## License
-[MIT] (add your license here)
-
 ---
 For full admin system details, see `SINGLE_ADMIN_SYSTEM.md`.
