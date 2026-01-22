@@ -1,0 +1,304 @@
+/* Global Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  @apply bg-gray-50;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* Container */
+.container {
+  @apply mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+/* Buttons */
+.btn {
+  @apply px-4 py-2 rounded-lg font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+}
+
+.btn-primary {
+  @apply btn bg-blue-500 text-white hover:bg-blue-600 focus:ring-blue-500;
+}
+
+.btn-secondary {
+  @apply btn bg-gray-200 text-gray-800 hover:bg-gray-300 focus:ring-gray-500;
+}
+
+.btn-danger {
+  @apply btn bg-red-500 text-white hover:bg-red-600 focus:ring-red-500;
+}
+
+.btn-success {
+  @apply btn bg-green-500 text-white hover:bg-green-600 focus:ring-green-500;
+}
+
+.btn-warning {
+  @apply btn bg-yellow-500 text-white hover:bg-yellow-600 focus:ring-yellow-500;
+}
+
+.btn-sm {
+  @apply px-3 py-1 text-sm;
+}
+
+.btn-lg {
+  @apply px-6 py-3 text-lg;
+}
+
+/* Cards */
+.card {
+  @apply bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200;
+}
+
+.card-header {
+  @apply mb-4 pb-4 border-b border-gray-200;
+}
+
+.card-title {
+  @apply text-xl font-bold text-gray-800;
+}
+
+.card-body {
+  @apply text-gray-700;
+}
+
+.card-footer {
+  @apply mt-4 pt-4 border-t border-gray-200;
+}
+
+/* Forms */
+.form-group {
+  @apply mb-4;
+}
+
+.form-label {
+  @apply block text-sm font-medium text-gray-700 mb-2;
+}
+
+.form-input {
+  @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+}
+
+.form-select {
+  @apply form-input;
+}
+
+.form-textarea {
+  @apply form-input resize-none;
+}
+
+.form-error {
+  @apply text-red-500 text-sm mt-1;
+}
+
+.form-success {
+  @apply text-green-500 text-sm mt-1;
+}
+
+/* Alerts */
+.alert {
+  @apply px-4 py-3 rounded-lg mb-4 border;
+}
+
+.alert-info {
+  @apply bg-blue-50 border-blue-200 text-blue-800;
+}
+
+.alert-success {
+  @apply bg-green-50 border-green-200 text-green-800;
+}
+
+.alert-warning {
+  @apply bg-yellow-50 border-yellow-200 text-yellow-800;
+}
+
+.alert-error {
+  @apply bg-red-50 border-red-200 text-red-800;
+}
+
+/* Tables */
+.table-container {
+  @apply overflow-x-auto;
+}
+
+.table {
+  @apply w-full border-collapse;
+}
+
+.table-header {
+  @apply bg-gray-100 border-b border-gray-300;
+}
+
+.table-header th {
+  @apply px-4 py-3 text-left text-sm font-semibold text-gray-700;
+}
+
+.table-body td {
+  @apply px-4 py-3 text-sm border-b border-gray-200;
+}
+
+.table-body tr:hover {
+  @apply bg-gray-50;
+}
+
+/* Badges */
+.badge {
+  @apply inline-block px-3 py-1 rounded-full text-xs font-medium;
+}
+
+.badge-primary {
+  @apply bg-blue-100 text-blue-800;
+}
+
+.badge-success {
+  @apply bg-green-100 text-green-800;
+}
+
+.badge-warning {
+  @apply bg-yellow-100 text-yellow-800;
+}
+
+.badge-danger {
+  @apply bg-red-100 text-red-800;
+}
+
+.badge-info {
+  @apply bg-cyan-100 text-cyan-800;
+}
+
+/* Navigation */
+.navbar {
+  @apply bg-white shadow-md border-b border-gray-200;
+}
+
+.navbar-brand {
+  @apply text-xl font-bold text-blue-600;
+}
+
+.navbar-menu {
+  @apply flex items-center gap-4;
+}
+
+.navbar-link {
+  @apply text-gray-600 hover:text-gray-900 transition-colors;
+}
+
+.navbar-link.active {
+  @apply text-blue-600 font-semibold;
+}
+
+/* Loading */
+.loading {
+  @apply flex items-center justify-center;
+}
+
+.spinner {
+  @apply inline-block w-8 h-8 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin;
+}
+
+/* Grid */
+.grid-responsive {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4;
+}
+
+/* Modals */
+.modal-overlay {
+  @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50;
+}
+
+.modal-content {
+  @apply bg-white rounded-lg shadow-xl max-w-md w-full mx-4;
+}
+
+.modal-header {
+  @apply px-6 py-4 border-b border-gray-200 flex justify-between items-center;
+}
+
+.modal-title {
+  @apply text-lg font-semibold text-gray-800;
+}
+
+.modal-body {
+  @apply px-6 py-4;
+}
+
+.modal-footer {
+  @apply px-6 py-4 border-t border-gray-200 flex justify-end gap-2;
+}
+
+/* Dashboard Layout */
+.dashboard-container {
+  @apply min-h-screen bg-gray-50;
+}
+
+.dashboard-header {
+  @apply bg-white shadow-md p-6 mb-6;
+}
+
+.dashboard-title {
+  @apply text-3xl font-bold text-gray-800;
+}
+
+.dashboard-subtitle {
+  @apply text-gray-600 mt-2;
+}
+
+.dashboard-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6;
+}
+
+.dashboard-card {
+  @apply card;
+}
+
+/* Status Indicators */
+.status-badge {
+  @apply inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium;
+}
+
+.status-active {
+  @apply bg-green-100 text-green-800;
+}
+
+.status-inactive {
+  @apply bg-gray-100 text-gray-800;
+}
+
+.status-pending {
+  @apply bg-yellow-100 text-yellow-800;
+}
+
+.status-rejected {
+  @apply bg-red-100 text-red-800;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    @apply px-4;
+  }
+
+  .btn {
+    @apply px-3 py-2 text-sm;
+  }
+
+  .card {
+    @apply p-4;
+  }
+
+  .dashboard-grid {
+    @apply grid-cols-1 p-4;
+  }
+}
