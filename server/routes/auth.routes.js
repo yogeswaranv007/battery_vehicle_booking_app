@@ -4,12 +4,18 @@ const passport = require('passport');
 const { authenticateJWT } = require('../middleware/auth.middleware');
 const authController = require('../controllers/auth.controller');
 
-// Google OAuth routes (keep logic inline to avoid breaking behavior)
+// Google OAuth routes (disabled safely if env is missing)
 router.get('/google', (req, res, next) => {
+  if (!passport.googleStrategyEnabled) {
+    return res.status(503).json({ error: 'Google OAuth is not configured. Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET.' });
+  }
   passport.authenticate('google', { scope: ['profile', 'email'], prompt: 'select_account' })(req, res, next);
 });
 
 router.get('/google/callback', (req, res, next) => {
+  if (!passport.googleStrategyEnabled) {
+    return res.redirect(`${process.env.FRONTEND_URL}/login?error=Google OAuth not configured`);
+  }
   passport.authenticate('google', { failureRedirect: `${process.env.FRONTEND_URL}/login?error=Authentication failed`, session: false })(req, res, next);
 }, async (req, res) => {
   try {
