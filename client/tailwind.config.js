@@ -1,5 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-export default {
+module.exports = {
   content: [
     "./index.html",            // your main HTML
     "./src/**/*.{js,jsx,ts,tsx}" // all React components
@@ -16,4 +16,4 @@ export default {
     },
   },
   plugins: [],
-}
+};
