@@ -31,10 +31,9 @@ const Register = () => {
         const googleProfile = JSON.parse(decodeURIComponent(googleData));
         setFormData(prev => ({
           ...prev,
-          name: googleProfile.name,
+          name: googleProfile.displayName || googleProfile.name,
           email: googleProfile.email,
-          role: googleProfile.role,
-          googleProfile // Store the full Google profile
+          googleProfile // Store the full Google profile with id, displayName, email
         }));
         setIsGoogleRegistration(true);
       } catch (err) {
@@ -58,13 +57,15 @@ const Register = () => {
     try {
       if (isGoogleRegistration) {
         // Handle Google registration
-        const response = await fetch(`${API_URL}/auth/google/complete-registration`, {
+        const response = await fetch(`${API_URL}/auth/register-google`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            googleProfile: formData.googleProfile,
+            googleId: formData.googleProfile.id,
+            name: formData.name,
+            email: formData.email,
             regNumber: formData.regNumber
           })
         });
