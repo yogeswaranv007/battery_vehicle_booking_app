@@ -4,12 +4,13 @@ const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 const User = require('../models/User');
 
-// Serialize user
+/* =========================
+   SESSION HANDLING
+========================= */
 passport.serializeUser((user, done) => {
   done(null, user.id);
 });
 
-// Deserialize user
 passport.deserializeUser(async (id, done) => {
   try {
     const user = await User.findById(id);
@@ -19,88 +20,94 @@ passport.deserializeUser(async (id, done) => {
   }
 });
 
-// Google OAuth Strategy (guarded for missing env)
-const googleClientId = process.env.GOOGLE_CLIENT_ID;
-const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
-const googleCallbackURL = process.env.GOOGLE_CALLBACK_URL || 'http://localhost:5000/api/auth/google/callback';
+/* =========================
+   GOOGLE OAUTH STRATEGY
+========================= */
+const {
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
+  GOOGLE_CALLBACK_URL,
+} = process.env;
 
-if (googleClientId && googleClientSecret) {
-  passport.use(new GoogleStrategy({
-    clientID: googleClientId,
-    clientSecret: googleClientSecret,
-    callbackURL: googleCallbackURL
-  },
-  async (accessToken, refreshToken, profile, done) => {
-    try {
-      if (!profile.emails || !profile.emails[0]) {
-        console.error('No email found in Google profile');
-        return done(new Error('No email found in Google profile'), null);
-      }
-
-      // Validate email domain
-      const email = profile.emails[0].value;
-      if (!email.endsWith('@bitsathy.ac.in')) {
-        return done(new Error('Email must end with @bitsathy.ac.in'), null);
-      }
-
-      // Check if user exists with Google ID
-      let user = await User.findOne({ googleId: profile.id });
-
-      if (!user) {
-        // Check if email already exists
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-          // If user exists but doesn't have Google ID, add it
-          if (!existingUser.googleId) {
-            existingUser.googleId = profile.id;
-            await existingUser.save();
-            return done(null, existingUser);
+if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET && GOOGLE_CALLBACK_URL) {
+  passport.use(
+    new GoogleStrategy(
+      {
+        clientID: GOOGLE_CLIENT_ID,
+        clientSecret: GOOGLE_CLIENT_SECRET,
+        callbackURL: GOOGLE_CALLBACK_URL,
+      },
+      async (accessToken, refreshToken, profile, done) => {
+        try {
+          // Ensure email exists
+          if (!profile.emails || !profile.emails.length) {
+            return done(new Error('Google account has no email'), null);
           }
-          return done(new Error('Email already registered with a different Google account'), null);
+
+          const email = profile.emails[0].value;
+
+          // Restrict domain
+          if (!email.endsWith('@bitsathy.ac.in')) {
+            return done(new Error('Only bitsathy.ac.in emails allowed'), null);
+          }
+
+          // Find user by Google ID
+          let user = await User.findOne({ googleId: profile.id });
+
+          if (!user) {
+            // Check if email already exists
+            const existingUser = await User.findOne({ email });
+
+            if (existingUser) {
+              // Link Google account
+              existingUser.googleId = profile.id;
+              await existingUser.save();
+              return done(null, existingUser);
+            }
+
+            // Create new user
+            user = await User.create({
+              googleId: profile.id,
+              name: profile.displayName,
+              email,
+              role: 'student',
+              status: 'active',
+            });
+          }
+
+          return done(null, user);
+        } catch (err) {
+          console.error('Google OAuth Error:', err);
+          return done(err, null);
         }
-
-        // For first-time users, return a special object with Google profile data
-        const googleProfile = {
-          googleId: profile.id,
-          email: email,
-          name: profile.displayName,
-          role: 'student',
-          status: 'active'
-        };
-        return done(null, {
-          isNewUser: true,
-          googleProfile
-        });
       }
+    )
+  );
 
-      return done(null, user);
-    } catch (err) {
-      console.error('Google OAuth error:', err);
-      return done(err, null);
-    }
-  }));
-  passport.googleStrategyEnabled = true;
+  console.log('✅ Google OAuth strategy enabled');
 } else {
-  passport.googleStrategyEnabled = false;
-  console.warn('Google OAuth not configured: set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET to enable it.');
+  console.warn('⚠️ Google OAuth disabled: missing env variables');
 }
 
-// JWT Strategy
-const jwtOptions = {
-  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-  secretOrKey: process.env.JWT_SECRET
-};
-
-passport.use(new JwtStrategy(jwtOptions, async (payload, done) => {
-  try {
-    const user = await User.findById(payload._id);
-    if (user) {
-      return done(null, user);
+/* =========================
+   JWT STRATEGY
+========================= */
+passport.use(
+  new JwtStrategy(
+    {
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      secretOrKey: process.env.JWT_SECRET,
+    },
+    async (payload, done) => {
+      try {
+        const user = await User.findById(payload._id);
+        if (!user) return done(null, false);
+        return done(null, user);
+      } catch (err) {
+        return done(err, false);
+      }
     }
-    return done(null, false);
-  } catch (err) {
-    return done(err, false);
-  }
-}));
+  )
+);
 
-module.exports = passport; 
+module.exports = passport;
