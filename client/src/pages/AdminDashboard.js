@@ -374,7 +374,7 @@ const AdminDashboard = () => {
                 {pendingBookings.slice(0, 5).map((booking) => (
                   <div key={booking._id} className="border border-gray-200 rounded p-3 flex justify-between items-start">
                     <div>
-                      <p className="font-semibold">{booking.user.name}</p>
+                      <p className="font-semibold">{booking.user?.name || '[User Deleted]'}</p>
                       <p className="text-sm text-gray-600">{booking.fromPlace} → {booking.destination}</p>
                       <p className="text-sm text-gray-600">{new Date(booking.date).toLocaleDateString()} at {booking.time}</p>
                     </div>
@@ -774,15 +774,15 @@ const AdminDashboard = () => {
           {(() => {
             const filtered = bookings.filter((booking) => {
               if (bookingFilters.status !== 'all' && booking.status !== bookingFilters.status) return false;
-              if (bookingFilters.userId && booking.user._id !== bookingFilters.userId) return false;
+              if (bookingFilters.userId && booking.user?._id !== bookingFilters.userId) return false;
               if (bookingFilters.watchmanId && booking.approvedBy?._id !== bookingFilters.watchmanId) return false;
               if (bookingFilters.searchText) {
                 const searchLower = bookingFilters.searchText.toLowerCase();
                 return (
-                  booking.user.name.toLowerCase().includes(searchLower) ||
+                  booking.user?.name?.toLowerCase().includes(searchLower) ||
                   booking.fromPlace.toLowerCase().includes(searchLower) ||
                   booking.destination.toLowerCase().includes(searchLower) ||
-                  booking.user.regNumber?.toLowerCase().includes(searchLower)
+                  booking.user?.regNumber?.toLowerCase().includes(searchLower)
                 );
               }
               return true;
@@ -797,19 +797,25 @@ const AdminDashboard = () => {
                   <div key={booking._id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
                     <div className="flex justify-between items-start mb-3">
                       <div className="flex-1">
-                        <button
-                          onClick={() => setBookingFilters({ ...bookingFilters, userId: booking.user._id })}
-                          className="font-semibold text-indigo-600 hover:text-indigo-800 text-left"
-                        >
-                          {booking.user.name}
-                        </button>
-                        {booking.user.regNumber && (
-                          <button
-                            onClick={() => setBookingFilters({ ...bookingFilters, searchText: booking.user.regNumber })}
-                            className="text-xs text-gray-500 hover:text-gray-700 ml-2"
-                          >
-                            ({booking.user.regNumber})
-                          </button>
+                        {booking.user ? (
+                          <>
+                            <button
+                              onClick={() => setBookingFilters({ ...bookingFilters, userId: booking.user._id })}
+                              className="font-semibold text-indigo-600 hover:text-indigo-800 text-left"
+                            >
+                              {booking.user.name}
+                            </button>
+                            {booking.user.regNumber && (
+                              <button
+                                onClick={() => setBookingFilters({ ...bookingFilters, searchText: booking.user.regNumber })}
+                                className="text-xs text-gray-500 hover:text-gray-700 ml-2"
+                              >
+                                {booking.user.regNumber}
+                              </button>
+                            )}
+                          </>
+                        ) : (
+                          <p className="font-semibold text-gray-400">[User Deleted]</p>
                         )}
                         <p className="text-sm text-gray-600 mt-1">
                           {booking.fromPlace} → {booking.destination}
