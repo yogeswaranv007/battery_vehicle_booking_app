@@ -10,6 +10,15 @@ async function register(req, res) {
   }
 }
 
+async function registerGoogle(req, res) {
+  try {
+    const result = await authService.registerGoogle(req.body);
+    return res.status(result.status).json(result.body);
+  } catch (err) {
+    return res.status(500).json({ message: 'Server error', error: err.message });
+  }
+}
+
 async function login(req, res) {
   try {
     const result = await authService.loginLocal(req.body, { ip: req.ip, userAgent: req.headers['user-agent'] });
@@ -53,6 +62,7 @@ function me(req, res) {
 
 module.exports = {
   register,
+  registerGoogle,
   login,
   forgotPassword,
   verifyOtp,

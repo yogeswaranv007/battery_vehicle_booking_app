@@ -142,6 +142,52 @@ function getMe(user) {
   return { status: 200, body: user };
 }
 
+async function registerGoogle({ googleId, name, email, regNumber }) {
+  if (!googleId || !name || !email || !regNumber) {
+    return { status: 400, body: { message: 'Missing required fields', details: 'All fields are required' } };
+  }
+  if (!email.endsWith('@bitsathy.ac.in')) {
+    return { status: 400, body: { message: 'Invalid email format', details: 'Email must end with @bitsathy.ac.in' } };
+  }
+  const regNumberRegex = /^[0-9]{7}[A-Z]{2}[0-9]{3}$/;
+  if (!regNumberRegex.test(regNumber)) {
+    return { status: 400, body: { message: 'Invalid registration number format', details: 'Registration number must be in the format: 7376232IT286' } };
+  }
+
+  // Find or create user
+  let user = await User.findOne({ googleId });
+  
+  if (!user) {
+    const existingEmail = await User.findOne({ email });
+    if (existingEmail && !existingEmail.googleId) {
+      // Email exists but not linked to Google
+      return { status: 400, body: { message: 'Email already registered', details: 'This email is already registered. Please use login with email/password or contact support.' } };
+    }
+    if (existingEmail && existingEmail.googleId === googleId) {
+      user = existingEmail;
+    } else {
+      // Create new user
+      user = await User.create({
+        googleId,
+        name,
+        email,
+        regNumber,
+        role: 'student',
+        status: 'active',
+      });
+    }
+  } else {
+    // Update regNumber if missing
+    if (!user.regNumber) {
+      user.regNumber = regNumber;
+      await user.save();
+    }
+  }
+
+  const token = signUserToken(user);
+  return { status: 201, body: { token, user: { _id: user._id, name: user.name, email: user.email, role: user.role, status: user.status } } };
+}
+
 module.exports = {
   registerLocal,
   loginLocal,
@@ -149,4 +195,5 @@ module.exports = {
   verifyOtp,
   resetPassword,
   getMe,
+  registerGoogle,
 };

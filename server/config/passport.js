@@ -65,14 +65,23 @@ if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET && GOOGLE_CALLBACK_URL) {
               return done(null, existingUser);
             }
 
-            // Create new user
-            user = await User.create({
+            // For Google OAuth, mark as incomplete (needs regNumber from registration form)
+            // Return user object with flag to redirect to registration
+            const googleUser = {
+              _id: null, // No DB entry yet
               googleId: profile.id,
               name: profile.displayName,
               email,
               role: 'student',
               status: 'active',
-            });
+              isNewUser: true,
+              googleProfile: {
+                id: profile.id,
+                displayName: profile.displayName,
+                email: email,
+              }
+            };
+            return done(null, googleUser);
           }
 
           return done(null, user);

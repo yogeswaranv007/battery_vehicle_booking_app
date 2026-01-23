@@ -22,13 +22,17 @@ router.get('/google/callback', (req, res, next) => {
     if (!req.user) {
       return res.redirect(`${process.env.FRONTEND_URL}/login?error=No user found`);
     }
+
+    // Handle new Google users - redirect to registration to collect regNumber
     if (req.user.isNewUser) {
       const { googleProfile } = req.user;
       return res.redirect(`${process.env.FRONTEND_URL}/register?googleData=${encodeURIComponent(JSON.stringify(googleProfile))}`);
     }
+
     if (req.user.status !== 'active') {
       return res.redirect(`${process.env.FRONTEND_URL}/login?error=Account deactivated&details=Your account has been deactivated by the admin. Please contact the administrator.`);
     }
+
     const jwt = require('jsonwebtoken');
     const token = jwt.sign({ _id: req.user._id, role: req.user.role }, process.env.JWT_SECRET, { expiresIn: '1d' });
     return res.redirect(`${process.env.FRONTEND_URL}/auth/callback?token=${token}`);
@@ -41,6 +45,7 @@ router.get('/google/callback', (req, res, next) => {
 
 // Local auth endpoints via controller/service
 router.post('/register', authController.register);
+router.post('/register-google', authController.registerGoogle);
 router.post('/login', authController.login);
 router.post('/forgot-password', authController.forgotPassword);
 router.post('/verify-otp', authController.verifyOtp);
